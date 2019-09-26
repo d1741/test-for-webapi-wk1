@@ -28,8 +28,7 @@ router.post('/', validateAction, (req, res) => {
             id: req.body.id, 
             project_id: req.body.project_id,
             description: req.body.description,
-            notes: req.body.notes.id,
-            completed: req.body.completed
+            notes: req.body.notes
         })
         .then(response => {
             res.status(201).json(response)
@@ -61,18 +60,17 @@ router.put('/:id', (req, res) => {
 //remove()
 router.delete('/:id', (req, res) => {
     const id = req.params.id
-    if(!id) {
-        res.status(404).json({ message: "ID not found"})
-    } else {
-        data.remove(id)
-            .then(response => {
-                res.status(200).json({ message: "Action removed successfully"})
-            })
-            .catch(error => {
-                console.log("Check action router DELETE for error", error)
-                res.status(500).json({message: 'Could not DELETE action'})
-            })
-    }
+    data.remove(id)
+        .then(response => {
+            if(response && response > 0) {
+                res.status(200).json({message: "Action deleted"})
+            } else {
+                res.status(404).json({message: "This action does not exist"})
+            }
+        })
+        .catch(()=> {
+            res.status(500).json({errorMessage: "This action could not be removed"})
+        })
 })
 
 function validateAction(req, res, next) {
